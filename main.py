@@ -25,3 +25,7 @@ if __name__ == '__main__':
     linter = AILinter('gpt-4')
     linter.lint_code_snippets(inputs)
     linter.write_results_to_file('lint-results.txt')
+
+
+
+    

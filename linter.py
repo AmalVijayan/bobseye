@@ -30,3 +30,18 @@ class AILinter:
         with open(file_name, 'w', encoding='utf-8') as file:
             for index, result in enumerate(self.results):
                 file.write(f'snippet-{index + 1}, {result}\n')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
