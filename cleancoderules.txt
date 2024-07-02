@@ -1,0 +1,17 @@
+1. Choose names that reveal the intention of the code
+2. Avoid disinformation by choosing words whose actual meaning varies from their intended meaning.
+3. Avoid using names that are similar and hard to distinguish. Words like info and data should not be used together in a context.
+4. Make meaningful distinctions between words
+5. Avoid noisy words that have similar meanings. For example, Account, AccountInfo, and AccountData cannot be distinguished easily.
+6. Make sure the names can be pronounced without sounding like an idiot. Silly names must be avoided.
+7. Do not use single-letter names or numeric constants. 
+8. If a variable or constant needs to be used in multiple places then it definitely requires a searchable name.
+9. Avoid encoding type information into variable names.
+10. Avoid using single-letter names. The only place such variables should be tolerated is in the control variable for loops.
+11. Class names must always be nouns. Avoid names like data, info, manager, processor, etc. in the name of a class.
+12. Function names should use verbs or verb phrases. Post, delete, get, save, and is are common in function names.
+13. Do not use multiple words with similar meanings in the same context. Words like get, fetch, and retrieve should not be used together.
+14. Avoid using the same word to mean different things. For example, the word add should not be used to express both the addition of a character to a string and the insertion of an item to an array in a similar context.
+15. Use solution domain names, which are technical names that are closely tied to the solution when required.
+16. Problem domain names should only be used when it is hard to find a programmer-use term.
+17. Do not add more context to a name than what is necessary.

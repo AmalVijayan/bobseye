@@ -1,6 +1,41 @@
+from langchain_openai import OpenAIEmbeddings
 from linter import AILinter
+from vector import PineconeVectorDB
+import argparse
+import os
 
-if __name__ == '__main__':
+index_name = os.environ['PINECONE_INDEX_NAME']
+sourcefile = os.environ['DATA_SOURCE_FILE_NAME']
+embedding = OpenAIEmbeddings(model=os.environ['OPENAI_EMBEDDING_MODEL'])
+PINECONE_API_KEY = os.environ['PINECONE_API_KEY']
+
+def main():
+    parser = argparse.ArgumentParser(description="Creates a vectorDB with rules and lints a code snippet based on arguments passed")
+    parser.add_argument("function", 
+                        choices=['build_vector_db', 'lint_code'])
+    args = parser.parse_args()
+
+    if args.function == 'build_vector_db':
+        build_vector_db()
+    elif args.function == 'lint_code':
+        lint_code()
+    else:
+        raise Exception('invalid argument!')
+
+def build_vector_db():
+    vector_db = PineconeVectorDB(PINECONE_API_KEY, embedding)
+    vector_db.create_index(index_name)
+    vector_db.init_pineconedb_with_docs(sourcefile, index_name)
+
+def lint_code():
+    inputs = get_inputs()
+    vector_db = PineconeVectorDB(PINECONE_API_KEY, embedding)
+    retriever = vector_db.get_vectore_store(index_name).as_retriever()
+    linter = AILinter('gpt-4')
+    linter.lint_code_snippets_with_rag(inputs, retriever)
+    linter.write_results_to_file('lint-results.txt')
+
+def get_inputs():
     unclean_code =  """
                     def c(a, b):
                         x = []
@@ -16,16 +51,11 @@ if __name__ == '__main__':
 
                     return [x + y for x, y in zip(list1, list2)]
                  """
+    return [
+            unclean_code, 
+            clean_code
+            ]
 
-    inputs = [
-        {"snippet" : unclean_code},
-        {"snippet" : clean_code},
-        ]
-    
-    linter = AILinter('gpt-4')
-    linter.lint_code_snippets(inputs)
-    linter.write_results_to_file('lint-results.txt')
-
-
-
+if __name__ == '__main__':
+    main()
     

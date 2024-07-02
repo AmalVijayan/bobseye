@@ -1,26 +1,34 @@
-from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from prompt import SYSTEM_PROMPT
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
+from prompt import RAG_PROMPT
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
 
 class AILinter:
     def __init__(self, model_name):
         self._model = ChatOpenAI(model=model_name)
         self.results = []
+        
 
-    def lint_code_snippets(self, inputs):
-        ai_model_chain = self._create_ai_model_chain()
+    def lint_code_snippets_with_rag(self, inputs, retriever):
+        ai_model_chain = self._create_rag_chain(retriever)
         self.results = self._process_inputs(inputs, ai_model_chain)
 
-    def _create_ai_model_chain(self):
-        prompt_template = self._create_prompt_template()
-        parser = StrOutputParser()
-        chained_model = prompt_template | self._model | parser
-        return chained_model
-
+    def _create_rag_chain(self, retriever):
+        rag_chain = (
+            {"context": retriever | format_docs, "snippet": RunnablePassthrough()}
+            | self._create_prompt_template()
+            | self._model
+            | StrOutputParser()
+            )
+        return rag_chain
+    
     def _create_prompt_template(self):
         return ChatPromptTemplate.from_messages(
-            [("system", SYSTEM_PROMPT), ("user", "{snippet}")]
+            [("system", RAG_PROMPT), ("user", "{snippet}"),]
         )
 
     def _process_inputs(self, inputs, ai_model_chain):
